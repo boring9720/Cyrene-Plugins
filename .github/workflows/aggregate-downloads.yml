@@ -1,0 +1,39 @@
+# 每日聚合插件下载量：统计 Release 附件下载次数并写回 registry.json
+# 附件必须通过 Release 分发才会被 GitHub 计数（发布流程见 scripts/publish-plugins.ps1）
+name: 聚合插件下载量
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # UTC 20:00 = 北京时间次日 04:00
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aggregate-downloads
+  cancel-in-progress: false
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 统计下载量
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/aggregate-downloads.mjs
+      - name: 有变化时提交
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add registry.json
+          if git diff --cached --quiet; then
+            echo "下载量无变化，跳过提交"
+          else
+            git commit -m "更新插件下载量统计"
+            git push
+          fi

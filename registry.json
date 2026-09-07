@@ -1,6 +1,6 @@
 {
   "apiVersion": 1,
-  "updatedAt": "2026-09-03",
+  "updatedAt": "2026-09-07",
   "plugins": [
     {
       "id": "weather-tool",
@@ -9,7 +9,9 @@
       "description": "查询城市天气：优先使用用户配置的 OpenWeather 密钥，未配置时自动降级到免密钥的 Open-Meteo",
       "author": "Cyrene 示例",
       "deps": ["secrets"],
-      "zip": "zips/weather-tool-0.1.0.zip",
+      "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/weather-tool-0.1.0/weather-tool-0.1.0.zip",
+      "sha256": "dd898a51a155392c6f126e8ed887c626dbdec41d9f6858381840736540d8268d",
+      "downloads": 0,
       "homepage": "https://github.com/Playa-0v0/Cyrene-Agent/tree/master/examples/weather-tool"
     },
     {
@@ -19,7 +21,9 @@
       "description": "监听轮次结束事件，自动摘要对话并存档，把长期记忆注入下一轮上下文",
       "author": "Cyrene 示例",
       "deps": ["llm", "conversations"],
-      "zip": "zips/long-term-memory-0.1.0.zip",
+      "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/long-term-memory-0.1.0/long-term-memory-0.1.0.zip",
+      "sha256": "8cd387d55c1aee56313bc6f4f58ba075b06fda82a1778bd450ce8e066788828a",
+      "downloads": 0,
       "homepage": "https://github.com/Playa-0v0/Cyrene-Agent/tree/master/examples/long-term-memory"
     },
     {
@@ -29,7 +33,9 @@
       "description": "通过对话创建、管理自己的定时任务（创建后需在宿主界面确认启用）",
       "author": "Cyrene 示例",
       "deps": ["scheduler"],
-      "zip": "zips/scheduled-automation-0.1.0.zip",
+      "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/scheduled-automation-0.1.0/scheduled-automation-0.1.0.zip",
+      "sha256": "ec458269ac1f3cf45105b8b1b0c33454fbda706dcc320a6ad686991efbf4da81",
+      "downloads": 0,
       "homepage": "https://github.com/Playa-0v0/Cyrene-Agent/tree/master/examples/scheduled-automation"
     },
     {
@@ -39,7 +45,9 @@
       "description": "演示语音输入租约契约：接管输入、提交识别文本、释放归还。使用模拟识别文本，不含模型与推理运行时",
       "author": "Cyrene 示例",
       "deps": ["speech-input"],
-      "zip": "zips/local-asr-contract-0.1.0.zip",
+      "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/local-asr-contract-0.1.0/local-asr-contract-0.1.0.zip",
+      "sha256": "5d767839680beb44a6264aa0dbc63bb9290acce686cdb0b747851a82f9137adda",
+      "downloads": 0,
       "homepage": "https://github.com/Playa-0v0/Cyrene-Agent/tree/master/examples/local-asr-contract"
     },
     {
@@ -49,7 +57,9 @@
       "description": "查询本机系统状态：CPU、内存、磁盘、电池与开机时长",
       "author": "Playa",
       "deps": [],
-      "zip": "zips/system-status-0.1.0.zip",
+      "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip",
+      "sha256": "443a013a2dae834f38a131d9bb5249689f7d28861d3d0c97ca1939f63d4dcc6d",
+      "downloads": 0,
       "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/system-status"
     }
   ]

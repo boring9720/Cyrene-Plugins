@@ -16,23 +16,23 @@ Cyrene 昔涟官方插件收录仓库：开发者通过 Pull Request 提交插�
 
 | 插件 | 版本 | 简介 | 直接下载 | 开发者 |
 | --- | --- | --- | --- | --- |
-| [weather-tool](./plugins/weather-tool) | 0.1.0 | 查询城市天气：优先使用用户配置的 OpenWeather 密钥，未配置时自动降级到免密钥的 Open-Meteo | [ZIP](./zips/weather-tool-0.1.0.zip) | Cyrene 示例 |
-| [long-term-memory](./plugins/long-term-memory) | 0.1.0 | 监听轮次结束事件，自动摘要对话并存档，把长期记忆注入下一轮上下文 | [ZIP](./zips/long-term-memory-0.1.0.zip) | Cyrene 示例 |
-| [scheduled-automation](./plugins/scheduled-automation) | 0.1.0 | 通过对话创建、管理自己的定时任务（创建后需在宿主界面确认启用） | [ZIP](./zips/scheduled-automation-0.1.0.zip) | Cyrene 示例 |
-| [local-asr-contract](./plugins/local-asr-contract) | 0.1.0 | 本地语音识别契约示例：演示语音输入租约的获取、提交与释放 | [ZIP](./zips/local-asr-contract-0.1.0.zip) | Cyrene 示例 |
-| [system-status](./plugins/system-status) | 0.1.0 | 查询本机系统状态：CPU、内存、磁盘、电池与开机时长，附带可视化状态面板 | [ZIP](./zips/system-status-0.1.0.zip) | Playa |
+| [weather-tool](./plugins/weather-tool) | 0.1.0 | 查询城市天气：优先使用用户配置的 OpenWeather 密钥，未配置时自动降级到免密钥的 Open-Meteo | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/weather-tool-0.1.0/weather-tool-0.1.0.zip) | Cyrene 示例 |
+| [long-term-memory](./plugins/long-term-memory) | 0.1.0 | 监听轮次结束事件，自动摘要对话并存档，把长期记忆注入下一轮上下文 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/long-term-memory-0.1.0/long-term-memory-0.1.0.zip) | Cyrene 示例 |
+| [scheduled-automation](./plugins/scheduled-automation) | 0.1.0 | 通过对话创建、管理自己的定时任务（创建后需在宿主界面确认启用） | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/scheduled-automation-0.1.0/scheduled-automation-0.1.0.zip) | Cyrene 示例 |
+| [local-asr-contract](./plugins/local-asr-contract) | 0.1.0 | 本地语音识别契约示例：演示语音输入租约的获取、提交与释放 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/local-asr-contract-0.1.0/local-asr-contract-0.1.0.zip) | Cyrene 示例 |
+| [system-status](./plugins/system-status) | 0.1.0 | 查询本机系统状态：CPU、内存、磁盘、电池与开机时长，附带可视化状态面板 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip) | Playa |
 
 ---
 
 ## 用户：如何安装插件
 
-1. 在上方表格点击插件对应的 **ZIP** 链接直接下载（也可进入 `zips/` 目录选择）
+1. 在上方表格点击插件对应的 **ZIP** 链接直接下载（安装包以 GitHub Release 附件形式分发）
 2. 在 Cyrene 中打开 **设置 → 插件 → 导入 ZIP**，选择下载的压缩包
 3. 安装完成后在插件列表中**手动启用**
 
 说明：
 
-- `zips/` 中的压缩包由维护者从审核过的 `plugins/` 源码统一打包，与源码目录一一对应
+- 安装包由维护者从审核过的 `plugins/` 源码统一打包，以 GitHub Release 附件形式分发，与源码目录一一对应
 - 想查看插件源码：进入对应 `plugins/<插件id>/` 目录
 - 用户插件首次安装后默认停用，启用后才会生效
 - 插件更新：重新导入新版 ZIP 即可，插件数据（存储、密钥）不会丢失
@@ -69,10 +69,9 @@ Cyrene-Plugins/
 │       ├── manifest.json # 插件清单
 │       ├── index.cjs     # 编译后的入口
 │       └── README.md     # 插件说明
-├── zips/                 # 可直接导入的安装包（维护者从 plugins/ 统一打包）
-│   └── <插件id>-<版本>.zip
 ├── scripts/
-│   └── build-zips.ps1    # 打包脚本（维护者工具：合并 PR 后重新生成全部 ZIP）
+│   ├── publish-plugins.ps1     # 发布脚本（维护者工具：合并 PR 后打包并发布 GitHub Release）
+│   └── aggregate-downloads.mjs # 下载量聚合脚本（GitHub Action 每日自动运行）
 ├── registry.json         # 收录索引（插件元数据登记处）
 ├── CONTRIBUTING.md       # 提交规范（面向插件开发者）
 └── review-checklist.md   # 审核清单（面向维护者，也可供提交者自查）
