@@ -8,7 +8,6 @@
       "version": "0.1.0",
       "description": "查询本机系统状态：CPU、内存、磁盘、电池与开机时长",
       "author": "Playa",
-      "deps": [],
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip",
       "sha256": "443a013a2dae834f38a131d9bb5249689f7d28861d3d0c97ca1939f63d4dcc6d",
       "downloads": 1,

@@ -8,7 +8,7 @@
 
 - [ ] 目录名与 `manifest.json` 的 `id` 一致，全小写连字符
 - [ ] 目录内只有：`manifest.json` + 入口文件（`index.cjs`/`index.js`/`index.mjs`）+ `README.md` + 插件自带资源（如 `ui.html`、图片等，需在 PR 里说明用途），没有源码工程文件
-- [ ] `registry.json` 已登记该插件，字段与 manifest 一致（id、name、version、description、author、deps）
+- [ ] `registry.json` 已登记该插件，字段与 manifest 一致（id、name、version、description、author）
 - [ ] README「已收录插件」表格已添加（或更新）对应行，版本与简介和 manifest 一致
 - [ ] 单插件单 PR
 - [ ] 提交者未上传 ZIP（ZIP 一律由维护者从审核过的源码打包）
