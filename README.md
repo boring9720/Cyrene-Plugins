@@ -14,13 +14,13 @@ Cyrene 昔涟官方插件收录仓库：开发者通过 Pull Request 提交插�
 
 ## 已收录插件
 
-| 插件 | 版本 | 简介 | 直接下载 | 开发者 |
-| --- | --- | --- | --- | --- |
-| [weather-tool](./plugins/weather-tool) | 0.1.0 | 查询城市天气：优先使用用户配置的 OpenWeather 密钥，未配置时自动降级到免密钥的 Open-Meteo | —（示例，不分发） | Cyrene 示例 |
-| [long-term-memory](./plugins/long-term-memory) | 0.1.0 | 监听轮次结束事件，自动摘要对话并存档，把长期记忆注入下一轮上下文 | —（示例，不分发） | Cyrene 示例 |
-| [scheduled-automation](./plugins/scheduled-automation) | 0.1.0 | 通过对话创建、管理自己的定时任务（创建后需在宿主界面确认启用） | —（示例，不分发） | Cyrene 示例 |
-| [local-asr-contract](./plugins/local-asr-contract) | 0.1.0 | 本地语音识别契约示例：演示语音输入租约的获取、提交与释放 | —（示例，不分发） | Cyrene 示例 |
-| [system-status](./plugins/system-status) | 0.1.0 | 查询本机系统状态：CPU、内存、磁盘、电池与开机时长，附带可视化状态面板 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip) | Playa |
+| 插件 | 版本 | 简介 | 直接下载 | 开发者 | 原仓库 |
+| --- | --- | --- | --- | --- | --- |
+| [weather-tool](./plugins/weather-tool) | 0.1.0 | 查询城市天气：优先使用用户配置的 OpenWeather 密钥，未配置时自动降级到免密钥的 Open-Meteo | —（示例，不分发） | Cyrene 示例 | — |
+| [long-term-memory](./plugins/long-term-memory) | 0.1.0 | 监听轮次结束事件，自动摘要对话并存档，把长期记忆注入下一轮上下文 | —（示例，不分发） | Cyrene 示例 | — |
+| [scheduled-automation](./plugins/scheduled-automation) | 0.1.0 | 通过对话创建、管理自己的定时任务（创建后需在宿主界面确认启用） | —（示例，不分发） | Cyrene 示例 | — |
+| [local-asr-contract](./plugins/local-asr-contract) | 0.1.0 | 本地语音识别契约示例：演示语音输入租约的获取、提交与释放 | —（示例，不分发） | Cyrene 示例 | — |
+| [system-status](./plugins/system-status) | 0.1.0 | 查询本机系统状态：CPU、内存、磁盘、电池与开机时长，附带可视化状态面板 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip) | Playa | — |
 
 ---
 
