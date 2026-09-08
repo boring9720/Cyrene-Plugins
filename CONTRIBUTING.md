@@ -64,7 +64,6 @@ mv index.js index.cjs
   "version": "1.0.0",
   "description": "一句话说明插件做什么",
   "author": "你的名字或 GitHub ID",
-  "deps": ["llm"],
   "homepage": "https://github.com/you/my-plugin-src"
 }
 ```

@@ -41,34 +41,59 @@ Get-ChildItem $pluginsDir -Directory | Where-Object { -not $PluginId -or $_.Name
 
     $tag = "$($manifest.id)-$($manifest.version)"
     # 幂等保护：该版本已发布过 Release 就跳过
+    # （gh 对不存在的 release 会向 stderr 写错误，EAP=Stop 时 stderr 重定向
+    #   会被提升为终止错误，这里临时放宽再恢复）
+    $ErrorActionPreference = "Continue"
     gh release view $tag --repo $Repo 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) {
+    $releaseExists = ($LASTEXITCODE -eq 0)
+    $ErrorActionPreference = "Stop"
+    # Release 已存在且索引齐全才真正跳过；索引缺失（如发布后回写中途失败）走补写路径
+    if ($releaseExists -and $entry.zip -and $entry.sha256) {
         Write-Host "跳过 ${tag}：Release 已存在"
         return
     }
 
     $zipName = "${tag}.zip"
     $zipPath = Join-Path $zipsDir $zipName
-    # ZIP 内保留一层插件目录，与 GitHub「Download ZIP」形态一致，宿主导入逻辑支持
-    Compress-Archive -Path $_.FullName -DestinationPath $zipPath -Force
+    if ($releaseExists) {
+        # 补写索引：Release 已存在但 registry 缺下载地址，从 Release 拉回附件，不重复发布
+        Write-Host "补写索引 ${tag}：Release 已存在但 registry 缺少下载地址"
+        if (-not (Test-Path $zipPath)) {
+            gh release download $tag --repo $Repo --pattern $zipName --dir $zipsDir
+            if ($LASTEXITCODE -ne 0) {
+                throw "gh release download ${tag} 失败"
+            }
+        }
+    } else {
+        # ZIP 内保留一层插件目录，与 GitHub「Download ZIP」形态一致，宿主导入逻辑支持
+        Compress-Archive -Path $_.FullName -DestinationPath $zipPath -Force
+    }
     $sha256 = (Get-FileHash $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
     Write-Host ("发布 {0}  ({1:N1} kB)  sha256={2}" -f $zipName, ((Get-Item $zipPath).Length / 1KB), $sha256)
 
-    gh release create $tag $zipPath --title $tag --notes $manifest.description --repo $Repo
-    if ($LASTEXITCODE -ne 0) {
-        throw "gh release create ${tag} 失败"
+    if (-not $releaseExists) {
+        gh release create $tag $zipPath --title $tag --notes $manifest.description --repo $Repo
+        if ($LASTEXITCODE -ne 0) {
+            throw "gh release create ${tag} 失败"
+        }
     }
 
     # 回写索引：下载地址指向 Release 附件，附 SHA-256 供客户端校验完整性
-    $entry.version = $manifest.version
-    $entry.zip = "https://github.com/$Repo/releases/download/$tag/$zipName"
+    # （zip/sha256 字段提交者按规范留空，不存在的属性必须用 Add-Member 赋值）
+    $entry | Add-Member -NotePropertyName version -NotePropertyValue $manifest.version -Force
+    $entry | Add-Member -NotePropertyName zip -NotePropertyValue "https://github.com/$Repo/releases/download/$tag/$zipName" -Force
     $entry | Add-Member -NotePropertyName sha256 -NotePropertyValue $sha256 -Force
+    # 市场客户端要求 downloads 必须是数字，缺失的条目会被整条丢弃；每日聚合 Action 之后会更新为真实下载量
+    if ($null -eq $entry.downloads) {
+        $entry | Add-Member -NotePropertyName downloads -NotePropertyValue 0 -Force
+    }
     $changed = $true
 }
 
 if ($changed) {
     $registry.updatedAt = Get-Date -Format "yyyy-MM-dd"
-    # 统一写 UTF-8 无 BOM，避免不同 PowerShell 版本的默认编码差异
-    [System.IO.File]::WriteAllText($registryPath, ($registry | ConvertTo-Json -Depth 5), [System.Text.UTF8Encoding]::new($false))
+    # 统一写 UTF-8 无 BOM + 2 空格缩进（ConvertTo-Json 默认格式会造成整文件 diff 噪音）
+    $pretty = $registry | ConvertTo-Json -Depth 5 | node -e "const s=require("fs").readFileSync(0,"utf8");process.stdout.write(JSON.stringify(JSON.parse(s),null,2)+"\n")"
+    [System.IO.File]::WriteAllText($registryPath, $pretty, [System.Text.UTF8Encoding]::new($false))
     Write-Host "registry.json 已更新，请提交推送"
 }
