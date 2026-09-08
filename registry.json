@@ -8,18 +8,18 @@
       "version": "0.1.0",
       "description": "查询本机系统状态：CPU、内存、磁盘、电池与开机时长",
       "author": "Playa",
+      "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/system-status",
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip",
       "sha256": "443a013a2dae834f38a131d9bb5249689f7d28861d3d0c97ca1939f63d4dcc6d",
-      "downloads": 1,
-      "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/system-status"
+      "downloads": 1
     },
     {
       "id": "subscription-oauth",
       "name": "订阅 OAuth（ChatGPT / Claude / Grok）",
+      "version": "1.2.5",
       "description": "用订阅账号登录 ChatGPT / Claude / Grok，经本地代理在 Cyrene 中直接使用订阅模型，支持多账号切换、模型目录与用量显示",
       "author": "Cyrene 社区",
       "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/subscription-oauth",
-      "version": "1.2.5",
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/subscription-oauth-1.2.5/subscription-oauth-1.2.5.zip",
       "sha256": "d2298c16c100998d41d558545d11124fa1d4eae41202c2c0ed00ffe853f880e2",
       "downloads": 0
@@ -31,6 +31,8 @@
       "description": "在本机启动 IndexTTS 2.x 语音合成服务，供 Cyrene 的 GPT-SoVITS 通道直接调用",
       "author": "Downfallofthedownfall",
       "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/indextts-tts",
+      "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/indextts-tts-1.0.0/indextts-tts-1.0.0.zip",
+      "sha256": "5fb7cbbb9e10079fb9b199e1fb022b1d1df9d079a13f9b61f8863309239153ba",
       "downloads": 0
     }
   ]

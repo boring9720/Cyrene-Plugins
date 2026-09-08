@@ -93,7 +93,7 @@ Get-ChildItem $pluginsDir -Directory | Where-Object { -not $PluginId -or $_.Name
 if ($changed) {
     $registry.updatedAt = Get-Date -Format "yyyy-MM-dd"
     # 统一写 UTF-8 无 BOM + 2 空格缩进（ConvertTo-Json 默认格式会造成整文件 diff 噪音）
-    $pretty = $registry | ConvertTo-Json -Depth 5 | node -e "const s=require("fs").readFileSync(0,"utf8");process.stdout.write(JSON.stringify(JSON.parse(s),null,2)+"\n")"
-    [System.IO.File]::WriteAllText($registryPath, $pretty, [System.Text.UTF8Encoding]::new($false))
+    # 统一写 UTF-8 无 BOM（嵌套引号的 node -e 管道在 PowerShell 下会被截断导致写空文件，禁止使用）
+    [System.IO.File]::WriteAllText($registryPath, ($registry | ConvertTo-Json -Depth 5), [System.Text.UTF8Encoding]::new($false))
     Write-Host "registry.json 已更新，请提交推送"
 }
