@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>IndexTTS 本地语音</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 18px 20px 24px;
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      font-size: 13px;
+      color: #3a2f36;
+      background: #fff9fc;
+    }
+    h1 { font-size: 15px; margin: 0 0 4px; }
+    .hint { color: #8a7b84; line-height: 1.6; margin: 0 0 14px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 5px; font-weight: 600; }
+    .row { display: flex; gap: 8px; }
+    input[type="text"], input[type="number"], select {
+      flex: 1; min-width: 0; padding: 7px 9px; border: 1px solid #e6d6de;
+      border-radius: 8px; background: #fff; font: inherit; color: inherit;
+    }
+    input:focus, select:focus { outline: 2px solid #f2c6d8; outline-offset: 0; }
+    button {
+      appearance: none; -webkit-appearance: none;
+      padding: 7px 14px; border: 1px solid #e6d6de; border-radius: 8px;
+      background: #fff; font: inherit; color: inherit; cursor: pointer;
+      font-weight: 600;
+    }
+    button.primary { background: #fdeef5; border-color: #f0a9c6; color: #b03b6e; }
+    button.primary:hover { background: #fbe2ee; }
+    button.start { background: #e8f6ee; border-color: #9ed9b8; color: #1f7a4d; }
+    button.start:hover { background: #d9f0e3; }
+    button.stop { background: #fdeaea; border-color: #f0b4b4; color: #a83b3b; }
+    button.stop:hover { background: #fbdcdc; }
+    button:disabled {
+      background: #f4eef1; border-color: #e6d6de; color: #a99aa3;
+      opacity: 0.6; cursor: default;
+    }
+    .actions { display: flex; gap: 8px; margin: 14px 0 12px; }
+    .status {
+      border: 1px solid #e6d6de; border-radius: 10px; background: #fff;
+      padding: 10px 12px; line-height: 1.7; white-space: pre-wrap; word-break: break-all;
+    }
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: #c9bcc3; }
+    .dot.on { background: #43b581; }
+    .dot.pending { background: #e0a800; }
+    .dot.err { background: #d94b4b; }
+    .url { font-family: Consolas, "Courier New", monospace; background: #fdf0f6; padding: 1px 5px; border-radius: 5px; }
+    .msg { min-height: 16px; margin-top: 8px; color: #b03b5e; white-space: pre-wrap; word-break: break-all; }
+    .msg.ok { color: #1f7a4d; }
+    .progress { margin-top: 8px; padding: 8px 10px; border: 1px solid #e6d6de; border-radius: 8px; background: #fdf7fa; color: #8a5b74; line-height: 1.6; word-break: break-all; }
+    label.check { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    details.advanced { margin-top: 18px; border-top: 1px solid #f0e2e9; padding-top: 12px; }
+    details.advanced summary { cursor: pointer; font-weight: 600; color: #8a7b84; list-style: none; }
+    details.advanced summary::-webkit-details-marker { display: none; }
+    details.advanced summary::before { content: "▸ "; }
+    details.advanced[open] summary::before { content: "▾ "; }
+    .advanced-body { padding-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>IndexTTS 本地语音</h1>
+  <p class="hint">
+    在本机启动 IndexTTS 2.x 服务。配置好后，在 Cyrene 的 <b>TTS 设置里选择「GPT-SoVITS」</b>，
+    把 API 地址填成下面显示的地址即可；参考音频与提示文本在 Cyrene 的 GPT-SoVITS 配置里填写。
+  </p>
+
+  <div class="field">
+    <label for="install-dir">IndexTTS 安装目录</label>
+    <div class="row">
+      <input type="text" id="install-dir" placeholder="例如 D:\index-tts（含 .venv 与 checkpoints）" />
+      <button type="button" id="pick-install-dir">选择</button>
+    </div>
+  </div>
+  <div class="actions">
+    <button type="button" class="primary" id="oneclick">一键配置并启动</button>
+  </div>
+  <p class="hint">选到 IndexTTS 的安装目录即可——已装好则自动识别并启动；没装过则从 GitHub 自动下载安装（仓库 + 依赖 + 模型）。</p>
+
+  <div class="status" id="status">正在读取状态…</div>
+  <div class="msg" id="status-error"></div>
+  <div class="msg" id="msg"></div>
+  <div class="progress" id="progress" hidden></div>
+
+  <div class="actions">
+    <button type="button" class="start" id="start">启动</button>
+    <button type="button" class="stop" id="stop">停止</button>
+  </div>
+
+  <details class="advanced">
+    <summary>高级选项</summary>
+    <div class="advanced-body">
+      <div class="field">
+        <label for="model-dir">模型目录（含 config.yaml）</label>
+        <div class="row">
+          <input type="text" id="model-dir" placeholder="例如 D:\index-tts\checkpoints" />
+          <button type="button" id="pick-model-dir">选择</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="python-path">Python 路径（已安装 index-tts 与 torch）</label>
+        <div class="row">
+          <input type="text" id="python-path" placeholder="例如 D:\index-tts\.venv\Scripts\python.exe" />
+          <button type="button" id="pick-python">选择</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="port">端口</label>
+        <input type="number" id="port" min="1" max="65535" step="1" value="9880" />
+      </div>
+
+      <div class="field">
+        <label for="engine">引擎版本</label>
+        <select id="engine">
+          <option value="v2">v2（IndexTTS 2.0，默认，推荐）</option>
+          <option value="v2_5">v2_5（IndexTTS 2.5，需服务端支持）</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="check" for="auto-start">
+          <input type="checkbox" id="auto-start" />
+          启用插件时自动启动服务
+        </label>
+      </div>
+
+      <div class="field">
+        <label class="check" for="emotion">
+          <input type="checkbox" id="emotion" />
+          文本情感引导（按文本情感改变语气）
+        </label>
+        <p class="hint" style="margin:6px 0 0">开启后会额外加载 QwenEmotion 情感模型，占用更多内存；关闭可省下这部分。</p>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="primary" id="save">保存配置</button>
+      </div>
+    </div>
+  </details>
+
+  <script>
+    const { ipcRenderer } = require("electron");
+    const invoke = (channel, payload) =>
+      ipcRenderer.invoke("plugin:indextts-tts:" + channel, payload);
+
+    const el = (id) => document.getElementById(id);
+    const msg = el("msg");
+
+    function showMsg(text, ok) {
+      msg.textContent = text || "";
+      msg.className = "msg" + (ok ? " ok" : "");
+    }
+
+    let formLoaded = false;
+
+    // 只在初次加载与保存后填充表单，避免定时刷新把用户尚未保存的输入冲掉。
+    function renderForm(cfg) {
+      el("model-dir").value = cfg.modelDir || "";
+      el("python-path").value = cfg.pythonPath || "";
+      el("port").value = cfg.port;
+      el("engine").value = cfg.engineVersion;
+      el("auto-start").checked = cfg.autoStart !== false;
+      el("emotion").checked = cfg.emotionGuidance === true;
+    }
+
+    function renderStatus(state) {
+      const dotClass = state.ready ? "on" : state.starting ? "pending" : "off";
+      const label = state.ready ? "运行中" : state.starting ? "启动中" : "已停止";
+      el("status").innerHTML = [
+        '<span class="dot ' + dotClass + '"></span>' + label,
+        "地址：<span class=\"url\">" + state.baseUrl + "</span>",
+        "进程 PID：" + (state.pid == null ? "—" : state.pid),
+      ].join("<br>");
+      // 错误文本来自 Python 输出，用 textContent 避免 < / & 破坏排版。
+      el("status-error").textContent = state.lastError ? "最近错误：" + state.lastError : "";
+
+      // 启动中也能点「停止」取消（模型加载最长 240s）。
+      const busy = state.starting || state.running;
+      el("start").disabled = busy;
+      el("stop").disabled = !busy;
+    }
+
+    // 安装 / 下载进度（刷新与推送共用，安装中途重开窗口也能看到）。
+    function renderBootstrap(b) {
+      const box = el("progress");
+      if (!b || (!b.active && !b.error)) {
+        box.hidden = true;
+        box.textContent = "";
+        return;
+      }
+      box.hidden = false;
+      box.textContent = (b.error ? "✗ " : "⏳ ") + (b.error || b.message || "");
+    }
+
+    async function refresh() {
+      try {
+        const state = await invoke("getState");
+        if (!formLoaded) {
+          renderForm(state.config);
+          el("install-dir").value = state.installDir || "";
+          formLoaded = true;
+        }
+        renderStatus(state);
+        renderBootstrap(state.bootstrap);
+      } catch (err) {
+        showMsg("读取状态失败：" + (err && err.message ? err.message : err));
+      }
+    }
+
+    function collectConfig() {
+      return {
+        modelDir: el("model-dir").value.trim(),
+        pythonPath: el("python-path").value.trim(),
+        port: Number(el("port").value),
+        engineVersion: el("engine").value,
+        autoStart: el("auto-start").checked,
+        emotionGuidance: el("emotion").checked,
+      };
+    }
+
+    // ---- 一键配置 ----
+    el("pick-install-dir").addEventListener("click", async () => {
+      const picked = await invoke("pickInstallDir");
+      if (picked) el("install-dir").value = picked;
+    });
+
+    el("oneclick").addEventListener("click", async () => {
+      const dir = el("install-dir").value.trim();
+      if (!dir) {
+        showMsg("请先选择 IndexTTS 安装目录");
+        return;
+      }
+      showMsg("正在处理…");
+      el("oneclick").disabled = true;
+      try {
+        const res = await invoke("oneclick", dir);
+        if (res.state) {
+          renderForm(res.state.config);
+          formLoaded = true;
+          renderStatus(res.state);
+        }
+        if (res.ok) {
+          const what = res.mode === "installed" ? "已安装并启动" : "已配置并启动";
+          if (res.auxPending) {
+            showMsg("已配置并启动，但辅助模型（checkpoints/hf_cache）尚未下载：首次启动会先下载数 GB，"
+              + "可能超出就绪窗口——建议再点一次「一键配置并启动」完成预下载。", true);
+          } else {
+            showMsg(what + "：" + res.state.baseUrl, true);
+          }
+        } else if (res.canceled) {
+          showMsg("已取消安装");
+        } else {
+          showMsg(res.error || "一键配置失败");
+        }
+      } catch (err) {
+        showMsg("一键配置失败：" + (err && err.message ? err.message : err));
+      } finally {
+        el("oneclick").disabled = false;
+      }
+    });
+
+    // 安装 / 下载进度推送
+    ipcRenderer.on("plugin:indextts-tts:progress", (_event, p) => {
+      renderBootstrap(p);
+      if (p && p.error) showMsg(p.error);
+    });
+
+    // ---- 高级选项 ----
+    el("pick-model-dir").addEventListener("click", async () => {
+      const picked = await invoke("pickModelDir");
+      if (picked) el("model-dir").value = picked;
+    });
+
+    el("pick-python").addEventListener("click", async () => {
+      const picked = await invoke("pickPython");
+      if (picked) el("python-path").value = picked;
+    });
+
+    el("save").addEventListener("click", async () => {
+      showMsg("");
+      try {
+        const state = await invoke("saveConfig", collectConfig());
+        renderForm(state.config);
+        renderStatus(state);
+        showMsg("配置已保存", true);
+      } catch (err) {
+        showMsg("保存失败：" + (err && err.message ? err.message : err));
+      }
+    });
+
+    el("start").addEventListener("click", async () => {
+      showMsg("正在启动，首次加载模型可能需要 1-3 分钟…");
+      el("start").disabled = true;
+      try {
+        const res = await invoke("start");
+        renderStatus(res.state);
+        showMsg(res.ok ? "服务已启动" : "启动失败：" + (res.error || "未知错误"), res.ok);
+      } catch (err) {
+        showMsg("启动失败：" + (err && err.message ? err.message : err));
+      }
+    });
+
+    el("stop").addEventListener("click", async () => {
+      showMsg("");
+      el("stop").disabled = true;
+      try {
+        renderStatus(await invoke("stop"));
+        showMsg("服务已停止", true);
+      } catch (err) {
+        showMsg("停止失败：" + (err && err.message ? err.message : err));
+      }
+    });
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
