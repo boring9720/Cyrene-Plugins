@@ -23,6 +23,7 @@ Cyrene 昔涟官方插件收录仓库：开发者通过 Pull Request 提交插�
 | [system-status](./plugins/system-status) | 0.1.0 | 查询本机系统状态：CPU、内存、磁盘、电池与开机时长，附带可视化状态面板 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip) | Playa | — |
 | [subscription-oauth](./plugins/subscription-oauth) | 1.2.6 | 用订阅账号登录 ChatGPT / Claude / Grok，经本地代理按各家原生协议直通；支持多账号切换、模型目录与用量显示 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/subscription-oauth-1.2.6/subscription-oauth-1.2.6.zip) | 1971687396 | — |
 | [indextts-tts](./plugins/indextts-tts) | 1.0.0 | 在本机启动 IndexTTS 2.x 语音合成服务，供 Cyrene 的 GPT-SoVITS 通道直接调用 | [ZIP](https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/indextts-tts-1.0.0/indextts-tts-1.0.0.zip) | Downfallofthedownfall | — |
+| [ripples-of-aion](./plugins/ripples-of-aion) | 0.6.0 | 结构化记忆层：自动沉淀对话事实，混合检索 + LLM 精排、实体属性时间轴、autoDream 整合与五页可视化面板 | —（待维护者打包） | modusensus | [Ripples-of-Aion](https://github.com/modusensus/Ripples-of-Aion) |
 
 ---
 
