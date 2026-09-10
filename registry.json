@@ -1,6 +1,6 @@
 {
   "apiVersion": 1,
-  "updatedAt": "2026-09-09",
+  "updatedAt": "2026-09-10",
   "plugins": [
     {
       "id": "system-status",
@@ -11,7 +11,7 @@
       "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/system-status",
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/system-status-0.1.0/system-status-0.1.0.zip",
       "sha256": "443a013a2dae834f38a131d9bb5249689f7d28861d3d0c97ca1939f63d4dcc6d",
-      "downloads": 24
+      "downloads": 31
     },
     {
       "id": "subscription-oauth",
@@ -22,7 +22,7 @@
       "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/subscription-oauth",
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/subscription-oauth-1.2.6/subscription-oauth-1.2.6.zip",
       "sha256": "0e64ffda16e7c7e39201f0c91a4bf441575059fe55ffa67e46d1322c39646a5f",
-      "downloads": 6
+      "downloads": 11
     },
     {
       "id": "indextts-tts",
@@ -33,7 +33,7 @@
       "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/indextts-tts",
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/indextts-tts-1.0.0/indextts-tts-1.0.0.zip",
       "sha256": "5fb7cbbb9e10079fb9b199e1fb022b1d1df9d079a13f9b61f8863309239153ba",
-      "downloads": 13
+      "downloads": 18
     }
   ]
 }
