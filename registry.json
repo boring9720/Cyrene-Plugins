@@ -45,6 +45,15 @@
       "zip": "https://github.com/Playa-0v0/Cyrene-Plugins/releases/download/indextts-tts-1.0.0/indextts-tts-1.0.0.zip",
       "sha256": "5fb7cbbb9e10079fb9b199e1fb022b1d1df9d079a13f9b61f8863309239153ba",
       "downloads": 19
+    },
+    {
+      "id": "chat-export",
+      "name": "聊天记录导出",
+      "version": "1.0.0",
+      "description": "把本地聊天存档导出为人可读的 HTML / Markdown：聊天气泡界面、双方头像、思考过程与工具调用折叠展示",
+      "author": "Playa",
+      "homepage": "https://github.com/Playa-0v0/Cyrene-Plugins/tree/main/plugins/chat-export",
+      "downloads": 0
     }
   ]
 }

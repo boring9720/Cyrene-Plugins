@@ -1,0 +1,11 @@
+{
+  "apiVersion": 1,
+  "id": "chat-export",
+  "name": "聊天记录导出",
+  "version": "1.0.0",
+  "description": "解析本地聊天存档，导出为人可读的 HTML / Markdown 文件；纯用户侧工具，不注册 Agent 工具",
+  "author": "Playa",
+  "entry": "index.cjs",
+  "icon": "icon.png",
+  "defaultEnabled": false
+}
