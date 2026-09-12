@@ -8,23 +8,24 @@
  * 主进程指令：bili-music:player-cmd { action: load|pause|resume|stop|volume }
  * 上报事件：  bili-music:player-ended（播完，主进程切队列下一首）
  *             bili-music:player-event { type:"error", message }（出错上报）
- * 状态查询：  主进程 executeJavaScript("playerStatus()") 直读，不走 IPC */
-const { ipcRenderer } = require("electron");
+ * 状态查询：  主进程 executeJavaScript("playerStatus()") 直读，不走 IPC
+ * v0.3.3：不再 require electron，改走 player-preload.cjs 暴露的受控桥 window.biliPlayer */
+const bili = window.biliPlayer;
 const a = document.getElementById("a");
 
-ipcRenderer.on("plugin:bili-music:player-cmd", (_e, cmd) => {
+bili.onCmd((cmd) => {
   try {
     if (!cmd || typeof cmd.action !== "string") return;
     switch (cmd.action) {
       case "load":
         a.src = cmd.url;
-        a.play().catch((e) => ipcRenderer.send("plugin:bili-music:player-event", { type: "error", message: "autoplay: " + (e && e.message || e) }));
+        a.play().catch((e) => bili.sendEvent({ type: "error", message: "autoplay: " + (e && e.message || e) }));
         break;
       case "pause":
         a.pause();
         break;
       case "resume":
-        a.play().catch((e) => ipcRenderer.send("plugin:bili-music:player-event", { type: "error", message: "resume: " + (e && e.message || e) }));
+        a.play().catch((e) => bili.sendEvent({ type: "error", message: "resume: " + (e && e.message || e) }));
         break;
       case "stop":
         a.pause();
@@ -36,13 +37,13 @@ ipcRenderer.on("plugin:bili-music:player-cmd", (_e, cmd) => {
         break;
     }
   } catch (e) {
-    ipcRenderer.send("plugin:bili-music:player-event", { type: "error", message: String(e && e.message || e) });
+    bili.sendEvent({ type: "error", message: String(e && e.message || e) });
   }
 });
 
-a.addEventListener("ended", () => ipcRenderer.send("plugin:bili-music:player-ended"));
+a.addEventListener("ended", () => bili.sendEnded());
 a.addEventListener("error", () => {
-  if (a.error) ipcRenderer.send("plugin:bili-music:player-event", { type: "error", message: "audio error code=" + a.error.code });
+  if (a.error) bili.sendEvent({ type: "error", message: "audio error code=" + a.error.code });
 });
 
 function playerStatus() {

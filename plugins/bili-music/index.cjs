@@ -26,6 +26,10 @@
  * - 登录后收益：DASH 高码率音频档、放宽体积门禁、降低限流
  *
  * v0.3.1：搜索风控修复
+ * v0.3.3（审核后续建议落地）：
+ *   ① 播放器事件监听器改具名函数，unbindPlayerEvents 完整 removeListener（修复反复启停累积泄漏）
+ *   ② ffmpeg 一键安装加 SHA-256 供应链锁定 + 302 跳转域名白名单
+ *   ③ playerWin/pluginWin 收敛到 contextIsolation + 受控 preload 桥（player-preload.cjs / bili-preload.cjs）
  * - UA 换标准 Chrome（自定义 UA 被 B 站风控拦，返回 HTML）
  * - search/type 加 WBI 签名（w_rid/wts，nav 取 key + 混淆表 + md5）
  *
@@ -451,15 +455,32 @@ async function getFfmpegVersion(ffp) {
 // ffmpeg 一键安装：npmmirror 国内镜像下载静态单文件 → 存 DATA_DIR/bin → 自动配置
 // ---------------------------------------------------------------------------
 const FFMPEG_MIRROR = "https://registry.npmmirror.com/-/binary/ffmpeg-static/b6.0/ffmpeg-win32-x64";
+// v0.3.3：供应链锁定——下载内容 SHA-256 硬编码校验（npmmirror 实测两次一致，PE 头验证通过）
+const FFMPEG_SHA256 = "e9fd5e711debab9d680955fc1e38a2c1160fd280b144476cc3f62bc43ef49db1";
+// v0.3.3：302 跳转目标域名白名单（registry.npmmirror.com 会跳 cdn.npmmirror.com）
+const DOWNLOAD_ALLOWED_HOSTS = new Set(["registry.npmmirror.com", "cdn.npmmirror.com", "npmmirror.com"]);
 
-/** 跟随重定向下载文件（npmmirror 会 302 到 CDN） */
+function sha256File(p) {
+  return new Promise((resolve, reject) => {
+    const h = crypto.createHash("sha256");
+    const s = fs.createReadStream(p);
+    s.on("data", (c) => h.update(c));
+    s.on("end", () => resolve(h.digest("hex")));
+    s.on("error", reject);
+  });
+}
+
+/** 跟随重定向下载文件（npmmirror 会 302 到 CDN；跳转目标受域名白名单约束，v0.3.3） */
 function downloadToFile(url, dest, maxRedirects = 5) {
   return new Promise((resolve, reject) => {
     const req = https.get(url, { headers: { "User-Agent": UA } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location && maxRedirects > 0) {
         res.resume();
-        const next = new URL(res.headers.location, url).href;
-        return resolve(downloadToFile(next, dest, maxRedirects - 1));
+        const next = new URL(res.headers.location, url);
+        if (!DOWNLOAD_ALLOWED_HOSTS.has(next.hostname)) {
+          return reject(new Error(`E_REDIRECT_HOST_FORBIDDEN: ${next.hostname}`));
+        }
+        return resolve(downloadToFile(next.href, dest, maxRedirects - 1));
       }
       if (res.statusCode !== 200) {
         res.resume();
@@ -489,6 +510,11 @@ async function installFfmpeg() {
   const tmp = dest + ".downloading";
   try {
     await downloadToFile(FFMPEG_MIRROR, tmp);
+    // v0.3.3：SHA-256 供应链校验，不符即拒（防镜像被篡改/劫持）
+    const actual = await sha256File(tmp);
+    if (actual.toLowerCase() !== FFMPEG_SHA256) {
+      throw new Error(`E_FFMPEG_SHA256_MISMATCH: ${actual.slice(0, 16)}… ≠ ${FFMPEG_SHA256.slice(0, 16)}…`);
+    }
     fs.renameSync(tmp, dest);
   } catch (e) {
     fs.rmSync(tmp, { force: true });
@@ -896,7 +922,13 @@ function ensurePlayerWin() {
     show: false,
     width: 2,
     height: 2,
-    webPreferences: { nodeIntegration: true, contextIsolation: false },
+    webPreferences: {
+      // v0.3.3：按 Electron 最佳实践收敛——contextIsolation + 受控 preload 桥（player-preload.cjs）
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      preload: path.join(__dirname, "player-preload.cjs"),
+    },
   });
   playerLoaded = false;
   playerWin.on("closed", () => {
@@ -930,13 +962,16 @@ function onTrackEnded() {
   }
 }
 
+/** player.html 上报的错误事件（具名：unbind 时可 removeListener，v0.3.3） */
+function onPlayerEvent(_e, ev) {
+  if (ev && ev.type === "error") lastPlayerError = String(ev.message || ev);
+}
+
 function bindPlayerEvents() {
   if (playerEventBound) return;
   const { ipcMain } = require("electron");
   ipcMain.on(CH_PLAYER_ENDED, onTrackEnded);
-  ipcMain.on(CH_PLAYER_EVENT, (_e, ev) => {
-    if (ev && ev.type === "error") lastPlayerError = String(ev.message || ev);
-  });
+  ipcMain.on(CH_PLAYER_EVENT, onPlayerEvent);
   playerEventBound = true;
 }
 
@@ -944,6 +979,7 @@ function unbindPlayerEvents() {
   if (!playerEventBound) return;
   const { ipcMain } = require("electron");
   ipcMain.removeListener(CH_PLAYER_ENDED, onTrackEnded);
+  ipcMain.removeListener(CH_PLAYER_EVENT, onPlayerEvent);
   playerEventBound = false;
 }
 
@@ -1028,8 +1064,12 @@ async function openWindow() {
     autoHideMenuBar: true,
     backgroundColor: "#f7f9fc",
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      // v0.3.3：按 Electron 最佳实践收敛——contextIsolation + 受控 preload 桥（bili-preload.cjs，
+      // 仅放行 plugin:bili-music: 前缀通道）
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      preload: path.join(__dirname, "bili-preload.cjs"),
     },
   });
   const onMin = () => { if (pluginWin && !pluginWin.isDestroyed()) pluginWin.minimize(); };

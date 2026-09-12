@@ -170,8 +170,11 @@
       </div>
     </main>
   </div>
+  <!-- v0.3.3：qrcode.js 改用页面脚本加载（contextIsolation 下页面无 node require） -->
+  <script src="qrcode.js"></script>
   <script>
-    const { ipcRenderer } = require("electron");
+    // v0.3.3：不再 require("electron")，改走 bili-preload.cjs 暴露的受控桥（仅放行本插件前缀通道）
+    const ipcRenderer = window.bili;
     const $ = (id) => document.getElementById(id);
 
     function setStatus(text, kind) {
@@ -402,7 +405,8 @@
     // 扫码登录（v0.3.0）
     // ---------------------------------------------------------------------------
     let qrcodeLib = null;
-    try { qrcodeLib = require("./qrcode.js"); } catch (e) { qrcodeLib = null; }
+    // v0.3.3：qrcode.js 由 <script src> 加载为全局 qrcode 函数
+    try { qrcodeLib = (typeof qrcode === "function") ? qrcode : null; } catch (e) { qrcodeLib = null; }
 
     let loginPollTimer = null;
     function stopLoginPoll() { if (loginPollTimer) { clearInterval(loginPollTimer); loginPollTimer = null; } }
