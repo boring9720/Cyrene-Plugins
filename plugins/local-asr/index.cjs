@@ -1373,7 +1373,7 @@ module.exports = {
       logToUi(`⚠ 读取保存的唤醒设置失败：${e.message || e}`, true);
     }
 
-    ctx.registerIpc("set-wake", (_e, cfg) => {
+    ctx.registerIpc("set-wake", (cfg) => {
       logToUi(`[set-wake] 收到: mode=${cfg && cfg.mode} words="${cfg && cfg.words}"`);
       const mode = cfg && cfg.mode;
       if (mode === "off" || mode === "music" || mode === "always") wakeGate = mode;
